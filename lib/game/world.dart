@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
 
-// import './doodle_dash.dart';
+import './doodle_dash.dart';
 
 class World extends ParallaxComponent {
   @override
