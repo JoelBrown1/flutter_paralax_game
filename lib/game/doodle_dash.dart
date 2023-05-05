@@ -7,6 +7,7 @@ import 'world.dart';
 import 'managers/game_manager.dart';
 import 'managers/level_manager.dart';
 import 'managers/object_manager.dart';
+import 'sprites/player.dart';
 
 enum Character { dash, sparky }
 
@@ -21,6 +22,8 @@ class DoodleDash extends FlameGame
 
   int screenBufferSpace = 300;
 
+  late Player player;
+
   @override
   Future<void> onLoad() async {
     await add(_world);
@@ -31,8 +34,6 @@ class DoodleDash extends FlameGame
 
   @override
   void update(double dt) {
-    super.update(dt);
-
     if (gameManager.isIntro) {
       overlays.add('mainMenuOverlay');
       return;
@@ -41,6 +42,8 @@ class DoodleDash extends FlameGame
     if (gameManager.isPlaying) {
       checkLevelUp();
     }
+
+    super.update(dt);
   }
 
   @override
@@ -49,11 +52,13 @@ class DoodleDash extends FlameGame
   }
 
   void initializeGameStart() {
+    setCharacter();
     gameManager.reset();
 
     if (children.contains(objectManager)) objectManager.removeFromParent();
 
     levelManager.reset();
+    player.resetPosition();
 
     objectManager = ObjectManager(
       minVerticalDistanceToNextPlatform: levelManager.minDistance,
@@ -65,11 +70,16 @@ class DoodleDash extends FlameGame
     objectManager.configure(levelManager.level, levelManager.difficulty);
   }
 
-  void setCharacter() {}
+  void setCharacter() {
+    player = Player(
+      character: gameManager.character,
+      jumpSpeed: levelManager.startingJumpSpeed,
+    );
+    add(player);
+  }
 
   void startGame() {
     initializeGameStart();
-    print('removeing mainMenuOverlay');
     gameManager.state = GameState.playing;
     overlays.remove('mainMenuOverlay');
   }
