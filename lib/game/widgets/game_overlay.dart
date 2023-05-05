@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 
 import '../doodle_dash.dart';
 
+// import different widgets explicitly
+import './score_display.dart';
+
 class GameOverlay extends StatefulWidget {
   const GameOverlay(this.game, {super.key});
   final Game game;
@@ -18,11 +21,19 @@ class _GameOverlayState extends State<GameOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    print('inside game overlay');
     return Material(
       color: Colors.transparent,
       child: Stack(
         children: [
           Positioned(
+            top: 30,
+            left: 30,
+            child: ScoreDisplay(game: widget.game),
+          ),
+          Positioned(
+            top: 30,
+            right: 30,
             child: ElevatedButton(
               child: isPaused
                   ? const Icon(
@@ -34,7 +45,7 @@ class _GameOverlayState extends State<GameOverlay> {
                       size: 48,
                     ),
               onPressed: () {
-                // (widget.game as DoodleDash).togglePauseState();
+                (widget.game as DoodleDash).togglePauseState();
                 setState(
                   () {
                     isPaused = !isPaused;
