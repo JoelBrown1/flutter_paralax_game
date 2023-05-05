@@ -7,7 +7,6 @@ import './doodle_dash.dart';
 class World extends ParallaxComponent<DoodleDash> {
   @override
   Future<void> onLoad() async {
-    print('world parallax displayed');
     parallax = await gameRef.loadParallax(
       [
         ParallaxImageData('game/background/06_Background_Solid.png'),

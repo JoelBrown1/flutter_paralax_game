@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return Container(
             constraints: const BoxConstraints(
               maxWidth: 800,
-              maxHeight: 550,
+              minWidth: 550,
             ),
             child: GameWidget(
               game: game,
