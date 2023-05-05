@@ -67,7 +67,7 @@ class _MainMenuOverlayState extends State<MainMenuOverlay> {
                     ),
                     CharacterButton(
                       character: Character.sparky,
-                      selected: character == Character.dash,
+                      selected: character == Character.sparky,
                       onSelectChar: () {
                         setState(() {
                           character = Character.sparky;
@@ -175,6 +175,9 @@ class CharacterButton extends StatelessWidget {
               'assets/images/game/${character.name}_center.png',
               height: characterWidth,
               width: characterWidth,
+            ),
+            const WhiteSpace(
+              height: 18,
             ),
             Text(
               character.name,
