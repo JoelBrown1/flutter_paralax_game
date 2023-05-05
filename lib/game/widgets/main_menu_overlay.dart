@@ -176,6 +176,12 @@ class CharacterButton extends StatelessWidget {
               height: characterWidth,
               width: characterWidth,
             ),
+            Text(
+              character.name,
+              style: const TextStyle(
+                fontSize: 20,
+              ),
+            )
           ],
         ),
       ),
