@@ -88,4 +88,58 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
 
     return currentHightestPlatformY - distanceToNextY;
   }
+
+  Platform _semiRandomPlatform(Vector2 position) {
+    return NormalPlatform(position: position);
+  }
+
+  @override
+  void onMount() {
+    super.onMount();
+
+    var currentX = (gameRef.size.x.floor() / 2).toDouble() - 50;
+    var currentY =
+        gameRef.size.y - (_rand.nextInt(gameRef.size.y.floor()) / 3) - 50;
+
+    for (var i = 0; i < 9; i++) {
+      if (i != 0) {
+        currentX = _generateNextX(100);
+        currentY = _generateNextY();
+      }
+      _platforms.add(
+        _semiRandomPlatform(
+          Vector2(
+            currentX,
+            currentY,
+          ),
+        ),
+      );
+      add(_platforms[i]);
+    }
+  }
+
+  @override
+  void update(double dt) {
+    final topOfLowestPlatform =
+        _platforms.first.position.y + _tallestPlatformHeight;
+
+    final screenBottom = gameRef.player.position.y +
+        (gameRef.size.x / 2) +
+        gameRef.screenBufferSpace;
+
+    if (topOfLowestPlatform > screenBottom) {
+      var newPlatY = _generateNextY();
+      var newPlatX = _generateNextX(100);
+      final nextPlat = _semiRandomPlatform(Vector2(newPlatX, newPlatY));
+
+      add(nextPlat);
+
+      _platforms.add(nextPlat);
+      gameRef.gameManager.increaseScore();
+
+      _cleanupPlatforms();
+    }
+
+    super.update(dt);
+  }
 }

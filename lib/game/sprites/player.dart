@@ -36,10 +36,13 @@ class Player extends SpriteGroupComponent<PlayerState>
   bool get isMovingDown => _velocity.y > 0;
   Character character;
   double jumpSpeed;
+  final _gravity = 9;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
+    await add(CircleHitbox());
 
     await _loadCharacterSprites();
     current = PlayerState.center;
@@ -50,6 +53,7 @@ class Player extends SpriteGroupComponent<PlayerState>
     if (gameRef.gameManager.isIntro || gameRef.gameManager.isGameOver) return;
 
     _velocity.x = _hAxisInput * jumpSpeed;
+
     final double dashHorizontalCenter = size.x / 2;
 
     if (position.x < dashHorizontalCenter) {
@@ -59,7 +63,10 @@ class Player extends SpriteGroupComponent<PlayerState>
       position.x = dashHorizontalCenter;
     }
 
+    _velocity.y += _gravity;
+
     position += _velocity * dt;
+
     super.update(dt);
   }
 
@@ -79,6 +86,19 @@ class Player extends SpriteGroupComponent<PlayerState>
     return true;
   }
 
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+
+    bool isCollidingVertically =
+        (intersectionPoints.first.y - intersectionPoints.last.y).abs() < 5;
+
+    if (isMovingDown && isCollidingVertically) {
+      jump();
+      return;
+    }
+  }
+
   void moveLeft() {
     _hAxisInput = 0;
     current = PlayerState.left;
@@ -93,6 +113,10 @@ class Player extends SpriteGroupComponent<PlayerState>
 
   void reesetDirection() {
     _hAxisInput = 0;
+  }
+
+  void jump({double? specialJumpSpeed}) {
+    _velocity.y = specialJumpSpeed != null ? -specialJumpSpeed : -jumpSpeed;
   }
 
   void _removePowerupAfterTime(int ms) {
