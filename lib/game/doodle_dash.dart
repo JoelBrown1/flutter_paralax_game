@@ -41,6 +41,22 @@ class DoodleDash extends FlameGame
 
     if (gameManager.isPlaying) {
       checkLevelUp();
+
+      final Rect worldBounds = Rect.fromLTRB(
+        0,
+        camera.position.y - screenBufferSpace,
+        camera.gameSize.x,
+        camera.position.y + _world.size.y,
+      );
+
+      if (player.isMovingDown) {
+        camera.worldBounds = worldBounds;
+      }
+
+      var isInTopHalfOfScreen = player.position.y <= (_world.size.y / 2);
+      if (!player.isMovingDown && isInTopHalfOfScreen) {
+        camera.followComponent(player);
+      }
     }
 
     super.update(dt);
@@ -58,6 +74,10 @@ class DoodleDash extends FlameGame
     if (children.contains(objectManager)) objectManager.removeFromParent();
 
     levelManager.reset();
+    player.reset();
+    camera.worldBounds = Rect.fromLTRB(
+        0, _world.size.y, camera.gameSize.x, _world.size.y + screenBufferSpace);
+    camera.followComponent(player);
     player.resetPosition();
 
     objectManager = ObjectManager(
@@ -100,6 +120,7 @@ class DoodleDash extends FlameGame
   void checkLevelUp() {
     if (levelManager.shouldLevelUp(gameManager.score.value)) {
       levelManager.increaseLevel();
+      objectManager.configure(levelManager.level, levelManager.difficulty);
     }
   }
 }
