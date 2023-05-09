@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_paralax_game/game/sprites/platform.dart';
 
 import '../doodle_dash.dart';
 import '../managers/game_manager.dart';
@@ -94,8 +95,19 @@ class Player extends SpriteGroupComponent<PlayerState>
         (intersectionPoints.first.y - intersectionPoints.last.y).abs() < 5;
 
     if (isMovingDown && isCollidingVertically) {
-      jump();
-      return;
+      current = PlayerState.center;
+      if (other is NormalPlatform) {
+        jump();
+        return;
+      } else if (other is SpringBoard) {
+        jump(specialJumpSpeed: jumpSpeed * 2);
+        return;
+      } else if (other is BrokenPlatform &&
+          other.current == BrokenPlatformState.cracked) {
+        jump();
+        other.breakPlatform();
+        return;
+      }
     }
   }
 

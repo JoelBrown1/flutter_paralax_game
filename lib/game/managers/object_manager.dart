@@ -32,33 +32,6 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
     'enemy': false,
   };
 
-  void _cleanupPlatforms() {
-    final lowestPlat = _platforms.removeAt(0);
-
-    lowestPlat.removeFromParent();
-  }
-
-  void enableSpecialty(String specialty) {
-    specialPlatforms[specialty] = true;
-  }
-
-  void enableLevelSpecialty(int level) {}
-
-  void resetSpecialties() {
-    for (var key in specialPlatforms.keys) {
-      specialPlatforms[key] = false;
-    }
-  }
-
-  void configure(int nextLevel, Difficulty config) {
-    minVerticalDistanceToNextPlatform = gameRef.levelManager.minDistance;
-    maxVerticalDistanceToNextPlatform = gameRef.levelManager.maxDistance;
-
-    for (int i = 1; i <= nextLevel; i++) {
-      enableLevelSpecialty(i);
-    }
-  }
-
   double _generateNextX(int platformWidth) {
     final previousPlatformXRange = Range(
       _platforms.last.position.x,
@@ -90,7 +63,54 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
   }
 
   Platform _semiRandomPlatform(Vector2 position) {
+    if (specialPlatforms['spring'] == true &&
+        probGen.generateWithPrbability(15)) {
+      return SpringBoard(position: position);
+    }
+
+    if (specialPlatforms['broken'] == true &&
+        probGen.generateWithPrbability(10)) {
+      return BrokenPlatform(position: position);
+    }
     return NormalPlatform(position: position);
+  }
+
+  void _cleanupPlatforms() {
+    final lowestPlat = _platforms.removeAt(0);
+
+    lowestPlat.removeFromParent();
+  }
+
+  void enableSpecialty(String specialty) {
+    specialPlatforms[specialty] = true;
+  }
+
+  void enableLevelSpecialty(int level) {
+    switch (level) {
+      case 1:
+        enableSpecialty('spring');
+        break;
+      case 2:
+        enableSpecialty('broken');
+        break;
+      default:
+        break;
+    }
+  }
+
+  void resetSpecialties() {
+    for (var key in specialPlatforms.keys) {
+      specialPlatforms[key] = false;
+    }
+  }
+
+  void configure(int nextLevel, Difficulty config) {
+    minVerticalDistanceToNextPlatform = gameRef.levelManager.minDistance;
+    maxVerticalDistanceToNextPlatform = gameRef.levelManager.maxDistance;
+
+    for (int i = 1; i <= nextLevel; i++) {
+      enableLevelSpecialty(i);
+    }
   }
 
   @override
