@@ -6,6 +6,7 @@ import 'package:flutter_paralax_game/game/managers/level_manager.dart';
 import '../doodle_dash.dart';
 import '../util/num_utils.dart';
 import '../sprites/platform.dart';
+import '../sprites/powerup.dart';
 
 final Random _rand = Random();
 
@@ -23,6 +24,8 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
   final double _tallestPlatformHeight = 50;
   final List<Platform> _platforms =
       []; // need to write the platform.dart file for sprites
+  final List<EmemyPlatform> _enemies = [];
+  final List<PowerUp> _powerups = [];
 
   final Map<String, bool> specialPlatforms = {
     'spring': true,
@@ -75,6 +78,69 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
     return NormalPlatform(position: position);
   }
 
+  void _maybeAddPowerUp() {
+    if (specialPlatforms['noogler'] == true &&
+        probGen.generateWithPrbability(20)) {
+      var nooglerHat = NooglerHat(
+        position: Vector2(
+          _generateNextX(75),
+          _generateNextY(),
+        ),
+      );
+
+      add(nooglerHat);
+      _powerups.add(nooglerHat);
+    } else if (specialPlatforms['rocket'] == true &&
+        probGen.generateWithPrbability(15)) {
+      var rocket = Rocket(
+        position: Vector2(_generateNextX(50), _generateNextY()),
+      );
+
+      add(rocket);
+      _powerups.add(rocket);
+    }
+
+    _cleanupPowerups();
+  }
+
+  void _cleanupPowerups() {
+    final screenBottom = gameRef.player.position.y +
+       (gameRef.size.x / 2) +
+       gameRef.screenBufferSpace;
+       
+   while (_powerups.isNotEmpty && _powerups.first.position.y > screenBottom) {
+     if (_powerups.first.parent != null) {
+       remove(_powerups.first);
+     }
+     _powerups.removeAt(0);
+   }
+  }
+
+  void _maybeAddEnemy() {
+    if (specialPlatforms['enemy'] != true) {
+      return;
+    }
+
+    if (probGen.generateWithPrbability(20)) {
+      var enemy = EmemyPlatform(
+          position: Vector2(_generateNextX(100), _generateNextY()));
+      add(enemy);
+      _enemies.add(enemy);
+      _cleanupEnemies(); // fix for function that doesn't exist yet
+    }
+  }
+
+  void _cleanupEnemies() {
+    final screenBottom = gameRef.player.position.y +
+        (gameRef.size.x / 2) +
+        gameRef.screenBufferSpace;
+
+    while (_enemies.isNotEmpty && _enemies.first.position.y > screenBottom) {
+      remove(_enemies.first);
+      _enemies.removeAt(0);
+    }
+  }
+
   void _cleanupPlatforms() {
     final lowestPlat = _platforms.removeAt(0);
 
@@ -92,6 +158,15 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
         break;
       case 2:
         enableSpecialty('broken');
+        break;
+      case 3:
+        enableSpecialty('noogler');
+        break;
+      case 4:
+        enableSpecialty('rocket');
+        break;
+      case 5:
+        enableSpecialty('enemy');
         break;
       default:
         break;
@@ -158,6 +233,8 @@ class ObjectManager extends Component with HasGameRef<DoodleDash> {
       gameRef.gameManager.increaseScore();
 
       _cleanupPlatforms();
+      _maybeAddEnemy();
+      _maybeAddPowerUp();
     }
 
     super.update(dt);

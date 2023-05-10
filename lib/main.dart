@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'game/doodle_dash.dart';
 import 'game/widgets/game_overlay.dart';
+import 'game/widgets/game_over_overlay.dart';
 import 'game/widgets/main_menu_overlay.dart';
 import 'game/util/color_schemes.dart';
 
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
               overlayBuilderMap: <String, Widget Function(BuildContext, Game)>{
                 'gameOverlay': (context, game) => GameOverlay(game),
                 'mainMenuOverlay': (context, game) => MainMenuOverlay(game),
-                // 'gameOverOverlay': (context, game) => GameOverOverlay(game),
+                'gameOverOverlay': (context, game) => GameOverOverlay(game),
               },
             ),
           );

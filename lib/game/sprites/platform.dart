@@ -11,6 +11,8 @@ enum BrokenPlatformState { cracked, broken }
 
 enum SpringState { up, down }
 
+enum EnemyPlatformState { only }
+
 abstract class Platform<T> extends SpriteGroupComponent<T>
     with HasGameRef<DoodleDash>, CollisionCallbacks {
   final hitbox = RectangleHitbox();
@@ -143,5 +145,24 @@ class SpringBoard extends Platform<SpringState> {
     super.onCollisionEnd(other);
 
     current = SpringState.up;
+  }
+}
+
+class EmemyPlatform extends Platform<EnemyPlatformState> {
+  EmemyPlatform({super.position});
+
+  @override
+  Future<void>? onLoad() async {
+    var randBool = Random().nextBool();
+    var enemySprite = randBool ? 'enemy_trash_can' : 'enemy_error';
+
+    sprites = <EnemyPlatformState, Sprite>{
+      EnemyPlatformState.only:
+          await gameRef.loadSprite('game/$enemySprite.png'),
+    };
+
+    current = EnemyPlatformState.only;
+
+    return super.onLoad();
   }
 }
