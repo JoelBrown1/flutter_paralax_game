@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_paralax_game/game/sprites/platform.dart';
+import 'package:flutter_paralax_game/game/sprites/powerup.dart';
 
 import '../doodle_dash.dart';
 import '../managers/game_manager.dart';
@@ -14,7 +15,7 @@ enum PlayerState {
   center,
   rocket,
   nooglerCenter,
-  noogleLeft,
+  nooglerLeft,
   nooglerRight,
 }
 
@@ -91,6 +92,11 @@ class Player extends SpriteGroupComponent<PlayerState>
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
 
+    if (other is EmemyPlatform) {
+      gameRef.onLose();
+      return;
+    }
+
     bool isCollidingVertically =
         (intersectionPoints.first.y - intersectionPoints.last.y).abs() < 5;
 
@@ -109,7 +115,33 @@ class Player extends SpriteGroupComponent<PlayerState>
         return;
       }
     }
+
+    if (!hasPowerUp && other is Rocket) {
+      current = PlayerState.rocket;
+      other.removeFromParent();
+      jump(specialJumpSpeed: jumpSpeed * other.jumpSpeedMultiplier);
+    } else if (!hasPowerUp && other is NooglerHat) {
+      if (current == PlayerState.left) current = PlayerState.nooglerLeft;
+      if (current == PlayerState.right) current = PlayerState.nooglerRight;
+      if (current == PlayerState.center) current = PlayerState.nooglerCenter;
+      other.removeFromParent();
+      _removePowerupAfterTime(other.activeLengthInMS);
+      jump(specialJumpSpeed: jumpSpeed * other.jumpSpeedMultiplier);
+    }
   }
+
+  bool get hasPowerUp =>
+      current == PlayerState.rocket ||
+      current == PlayerState.nooglerLeft ||
+      current == PlayerState.nooglerRight ||
+      current == PlayerState.nooglerCenter;
+
+  bool get isInvincible => current == PlayerState.rocket;
+
+  bool get isWearingHat =>
+      current == PlayerState.nooglerLeft ||
+      current == PlayerState.nooglerRight ||
+      current == PlayerState.nooglerCenter;
 
   void moveLeft() {
     _hAxisInput = 0;
@@ -172,7 +204,7 @@ class Player extends SpriteGroupComponent<PlayerState>
       PlayerState.center: center,
       PlayerState.rocket: rocket,
       PlayerState.nooglerCenter: nooglerCenter,
-      PlayerState.noogleLeft: nooglerLeft,
+      PlayerState.nooglerLeft: nooglerLeft,
       PlayerState.nooglerRight: nooglerRight,
     };
   }

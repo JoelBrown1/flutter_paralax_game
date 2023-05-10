@@ -36,6 +36,10 @@ class DoodleDash extends FlameGame
   void update(double dt) {
     super.update(dt);
 
+    if (gameManager.isGameOver) {
+      return;
+    }
+
     if (gameManager.isIntro) {
       overlays.add('mainMenuOverlay');
       return;
@@ -61,6 +65,14 @@ class DoodleDash extends FlameGame
 
       if (!player.isMovingDown && isInTopHalfOfScreen) {
         camera.followComponent(player);
+      }
+
+      if (player.position.y >
+          camera.position.y +
+              _world.size.y +
+              player.size.y +
+              screenBufferSpace) {
+        onLose();
       }
     }
   }
@@ -123,6 +135,12 @@ class DoodleDash extends FlameGame
     } else {
       pauseEngine();
     }
+  }
+
+  void onLose() {
+    gameManager.state = GameState.gameOver;
+    player.removeFromParent();
+    overlays.add('gameOverOverlay');
   }
 
   void checkLevelUp() {
