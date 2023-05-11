@@ -155,7 +155,7 @@ class Player extends SpriteGroupComponent<PlayerState>
     _hAxisInput += movingRightInput;
   }
 
-  void reesetDirection() {
+  void resetDirection() {
     _hAxisInput = 0;
   }
 
